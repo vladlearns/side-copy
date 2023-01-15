@@ -11,6 +11,7 @@ document.body.appendChild(toggleBtn);
 const filePickerBtn = document.createElement("button");
 filePickerBtn.id = "json-folder-picker";
 filePickerBtn.textContent = "Choose Folder";
+filePickerBtn.classList = "btn-choose-folder";
 document.body.appendChild(filePickerBtn);
 
 const input = document.createElement("input");
@@ -95,7 +96,7 @@ style.innerHTML = `
 		right: 0;
 		bottom: 0;
 		width: 30%;
-		background-color: #1e2021;
+		background-color: rgb(30, 32, 33, .5);
 		overflow-y: auto;
 		padding: 10px;
 		z-index: 1;
@@ -124,7 +125,7 @@ style.innerHTML = `
 		right: 10px;
 		z-index: 1;
 	  }
-	  /* Add some styling to the json data displayed in the sidebar */
+
 	  #json-sidebar pre {
 	  background: #fff;
 	  padding: 10px;
@@ -132,13 +133,13 @@ style.innerHTML = `
 	  overflow: auto;
 	  }
   
-	  /* Add some styling to the summary element */
+	
 	  #json-sidebar summary {
 	  font-weight: bold;
 	  cursor: pointer;
 	  }
   
-	  /* Add some basic styling to the toggle button */
+
 	  #toggle-btn {
 	  position: fixed;
 	  top: 20px;
@@ -150,7 +151,7 @@ style.innerHTML = `
 	  cursor: pointer;
 	  }
   
-	  /* Add some basic styling to the copy button */
+
 	  #json-sidebar button {
 	  margin-top: 10px;
 	  padding: 5px 10px;
@@ -160,13 +161,12 @@ style.innerHTML = `
 	  cursor: pointer;
 	  }
   
-	  /* Add some hover effect to the copy button */
+
 	  #
 	  #json-sidebar button:hover {
 		  background: #3e8e41;
 	  }
 	  
-	  /* Add some basic animation to the sidebar */
 	  @keyframes slideIn {
 		  from {transform: translateX(-100%);}
 		  to {transform: translateX(0);}
@@ -175,5 +175,28 @@ style.innerHTML = `
 	  #json-sidebar.open {
 		  animation: slideIn 0.5s ease-in-out forwards;
 	  }
+
+	  #json-sidebar div {
+		  position: relative;
+		  padding: 10px;
+		  border: 1px solid #ccc;
+		  border-radius: 10px;
+		  margin-bottom: 45px;
+	  }
+	  
+	  #json-sidebar div button {
+		  position: absolute;
+		  bottom: -40px;
+		  right: 10px;
+	  }
+	  
+	  #toggle-btn {
+		  z-index: 1;
+	  }
+	  
+	  #btn-choose-folder {
+		  z-index: 1;
+	  }
+	  
 	`;
 document.head.appendChild(style);
