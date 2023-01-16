@@ -22,70 +22,88 @@ input.style.display = "none";
 input.accept = ".json";
 document.body.appendChild(input);
 
-filePickerBtn.addEventListener("click", () => {
-	input.click();
+toggleBtn.addEventListener("click", () => {
+	sidebar.classList.toggle("hidden");
+	chrome.storage.local.get(["sidebarContent"]).then((result) => {
+		if (result.sidebarContent) {
+			getFiles(false, result.sidebarContent);
+			console.log(result.sidebarContent);
+		}
+	});
 });
 
-input.addEventListener("change", (event) => {
-	const files = event.target.files;
-	for (let i = 0; i < files.length; i++) {
-		const file = files[i];
-		const reader = new FileReader();
-		reader.onload = (event) => {
-			const jsonData = JSON.parse(event.target.result);
-			const spoiler = document.createElement("details");
-			const summary = document.createElement("summary");
-			summary.textContent = file.name;
-			spoiler.appendChild(summary);
-
-			// Recursively loop through the json object and add each property to the sidebar
-			function addProperties(obj, parent) {
-				for (let key in obj) {
-					if (obj.hasOwnProperty(key)) {
-						if (!Array.isArray(obj[key]) && typeof obj[key] === "object") {
-							const subSpoiler = document.createElement("details");
-							const subSummary = document.createElement("summary");
-							subSummary.textContent = key;
-							subSpoiler.appendChild(subSummary);
-							parent.appendChild(subSpoiler);
-							addProperties(obj[key], subSpoiler);
-						} else if (Array.isArray(obj[key])) {
-							const property = document.createElement("div");
-							property.textContent = `${key} : ${JSON.stringify(
-								obj[key],
-								null,
-								4
-							)}`;
-							const copyBtn = document.createElement("button");
-							copyBtn.textContent = "Copy to clipboard";
-							copyBtn.addEventListener("click", () => {
-								navigator.clipboard.writeText(obj[key]);
-							});
-							property.appendChild(copyBtn);
-							parent.appendChild(property);
-						} else {
-							const property = document.createElement("div");
-							property.textContent = `${key}: ${obj[key]}`;
-							const copyBtn = document.createElement("button");
-							copyBtn.textContent = "Copy to clipboard";
-							copyBtn.addEventListener("click", () => {
-								navigator.clipboard.writeText(obj[key]);
-							});
-							property.appendChild(copyBtn);
-							parent.appendChild(property);
+const getFiles = (event, storedFiles) => {
+	return new Promise((resolve, reject) => {
+		const files = event && event.target.files;
+		const tempFiles = [];
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			const reader = new FileReader();
+			reader.onload = (event) => {
+				const jsonData = storedFiles || JSON.parse(event.target.result);
+				const spoiler = document.createElement("details");
+				const summary = document.createElement("summary");
+				summary.textContent = file.name;
+				spoiler.appendChild(summary);
+				tempFiles.push(jsonData);
+				// Recursively loop through the json object and add each property to the sidebar
+				function addProperties(obj, parent) {
+					for (let key in obj) {
+						if (obj.hasOwnProperty(key)) {
+							if (!Array.isArray(obj[key]) && typeof obj[key] === "object") {
+								const subSpoiler = document.createElement("details");
+								const subSummary = document.createElement("summary");
+								subSummary.textContent = key;
+								subSpoiler.appendChild(subSummary);
+								parent.appendChild(subSpoiler);
+								addProperties(obj[key], subSpoiler);
+							} else if (Array.isArray(obj[key])) {
+								const property = document.createElement("div");
+								property.textContent = `${key} : ${JSON.stringify(
+									obj[key],
+									null,
+									4
+								)}`;
+								const copyBtn = document.createElement("button");
+								copyBtn.textContent = "Copy to clipboard";
+								copyBtn.addEventListener("click", () => {
+									navigator.clipboard.writeText(obj[key]);
+								});
+								property.appendChild(copyBtn);
+								parent.appendChild(property);
+							} else {
+								const property = document.createElement("div");
+								property.textContent = `${key}: ${obj[key]}`;
+								const copyBtn = document.createElement("button");
+								copyBtn.textContent = "Copy to clipboard";
+								copyBtn.addEventListener("click", () => {
+									navigator.clipboard.writeText(obj[key]);
+								});
+								property.appendChild(copyBtn);
+								parent.appendChild(property);
+							}
 						}
 					}
 				}
-			}
-			addProperties(jsonData, spoiler);
-			sidebar.appendChild(spoiler);
-		};
-		reader.readAsText(file);
-	}
-});
+				addProperties(jsonData, spoiler);
+				sidebar.appendChild(spoiler);
+			};
+			reader.readAsText(file);
+		}
+		resolve(tempFiles);
+	});
+};
 
-toggleBtn.addEventListener("click", () => {
-	sidebar.classList.toggle("hidden");
+filePickerBtn.addEventListener("click", () => {
+	input.click();
+});
+input.addEventListener("change", (event) => {
+	getFiles(event).then((storedFiles) => {
+		console.log(storedFiles); // This is an array of all the json files. It is displayed in the console for testing purposes
+		chrome.storage.local.set({
+			sidebarContent: storedFiles,
+		});
+	});
 });
 
 const style = document.createElement("style");
@@ -199,4 +217,5 @@ style.innerHTML = `
 	  }
 	  
 	`;
+
 document.head.appendChild(style);
