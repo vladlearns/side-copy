@@ -26,6 +26,16 @@ toggleBtn.addEventListener("click", () => {
 	sidebar.classList.toggle("hidden");
 
 	chrome.storage.local.get(["sidebarContent"]).then((result) => {
+		result.sidebarContent.forEach((file, i, storedFiles) => {
+			if (
+				document
+					.querySelectorAll("#json-sidebar > details > summary")
+					.some((summary) => summary.innerHTML.includes(file[i].value.name))
+			) {
+				delete storedFiles[i];
+			}
+		});
+
 		if (result.sidebarContent) {
 			getFiles(false, result.sidebarContent);
 		}
