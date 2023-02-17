@@ -22,25 +22,25 @@ input.style.display = "none";
 input.accept = ".json";
 document.body.appendChild(input);
 
-toggleBtn.addEventListener("click", () => {
-	sidebar.classList.toggle("hidden");
+const dupeCheck = () => {``
+	if (chrome.storage.local) {
+		chrome.storage.local.get(["sidebarContent"]).then((result) => {
+			result.sidebarContent.forEach((file, i, storedFiles) => {
+				if (
+					Array.from(
+						document.querySelectorAll("#json-sidebar > details > summary")
+					).some((summary) => summary.innerHTML.includes(file[i].value.name))
+				) {
+					delete storedFiles[i];
+				}
+			});
 
-	chrome.storage.local.get(["sidebarContent"]).then((result) => {
-		result.sidebarContent.forEach((file, i, storedFiles) => {
-			if (
-				document
-					.querySelectorAll("#json-sidebar > details > summary")
-					.some((summary) => summary.innerHTML.includes(file[i].value.name))
-			) {
-				delete storedFiles[i];
+			if (result.sidebarContent) {
+				getFiles(false, result.sidebarContent);
 			}
 		});
-
-		if (result.sidebarContent) {
-			getFiles(false, result.sidebarContent);
-		}
-	});
-});
+	}
+};
 
 const generator = async (file, event) => {
 	const jsonData = file.status
@@ -48,72 +48,79 @@ const generator = async (file, event) => {
 		: JSON.parse(event.target.result);
 	const spoiler = document.createElement("details");
 	const summary = document.createElement("summary");
+	if (
+		Array.from(
+			document.querySelectorAll("#json-sidebar > details > summary")
+		).some((summary) => summary.innerHTML.includes(file.name))
+	) {
+		console.log("Duplicate found");
+	} else {
+		summary.textContent = file.status ? file.value.name : file.name;
 
-	summary.textContent = file.status ? file.value.name : file.name;
+		spoiler.appendChild(summary);
 
-	spoiler.appendChild(summary);
+		// Recursively loop through the json object and add each property to the sidebar
 
-	// Recursively loop through the json object and add each property to the sidebar
+		function addProperties(obj, parent) {
+			for (let key in obj) {
+				if (obj.hasOwnProperty(key)) {
+					if (!Array.isArray(obj[key]) && typeof obj[key] === "object") {
+						const subSpoiler = document.createElement("details");
+						const subSummary = document.createElement("summary");
 
-	function addProperties(obj, parent) {
-		for (let key in obj) {
-			if (obj.hasOwnProperty(key)) {
-				if (!Array.isArray(obj[key]) && typeof obj[key] === "object") {
-					const subSpoiler = document.createElement("details");
-					const subSummary = document.createElement("summary");
+						subSummary.textContent = key;
 
-					subSummary.textContent = key;
+						subSpoiler.appendChild(subSummary);
 
-					subSpoiler.appendChild(subSummary);
+						parent.appendChild(subSpoiler);
 
-					parent.appendChild(subSpoiler);
+						addProperties(obj[key], subSpoiler);
+					} else if (Array.isArray(obj[key])) {
+						const property = document.createElement("div");
 
-					addProperties(obj[key], subSpoiler);
-				} else if (Array.isArray(obj[key])) {
-					const property = document.createElement("div");
+						property.textContent = `${key} : ${JSON.stringify(
+							obj[key],
 
-					property.textContent = `${key} : ${JSON.stringify(
-						obj[key],
+							null,
 
-						null,
+							4
+						)}`;
+						const copyBtn = document.createElement("button");
 
-						4
-					)}`;
-					const copyBtn = document.createElement("button");
+						copyBtn.textContent = "Copy to clipboard";
 
-					copyBtn.textContent = "Copy to clipboard";
+						copyBtn.addEventListener("click", () => {
+							navigator.clipboard.writeText(obj[key]);
+						});
 
-					copyBtn.addEventListener("click", () => {
-						navigator.clipboard.writeText(obj[key]);
-					});
+						property.appendChild(copyBtn);
 
-					property.appendChild(copyBtn);
+						parent.appendChild(property);
+					} else {
+						const property = document.createElement("div");
 
-					parent.appendChild(property);
-				} else {
-					const property = document.createElement("div");
+						property.textContent = `${key}: ${obj[key]}`;
 
-					property.textContent = `${key}: ${obj[key]}`;
+						const copyBtn = document.createElement("button");
 
-					const copyBtn = document.createElement("button");
+						copyBtn.textContent = "Copy to clipboard";
 
-					copyBtn.textContent = "Copy to clipboard";
+						copyBtn.addEventListener("click", () => {
+							navigator.clipboard.writeText(obj[key]);
+						});
 
-					copyBtn.addEventListener("click", () => {
-						navigator.clipboard.writeText(obj[key]);
-					});
+						property.appendChild(copyBtn);
 
-					property.appendChild(copyBtn);
-
-					parent.appendChild(property);
+						parent.appendChild(property);
+					}
 				}
 			}
 		}
-	}
-	addProperties(jsonData, spoiler);
+		addProperties(jsonData, spoiler);
 
-	sidebar.appendChild(spoiler);
-	return { name: file.name, content: jsonData };
+		sidebar.appendChild(spoiler);
+		return { name: file.name, content: jsonData };
+	}
 };
 
 const getFiles = (event, storedFiles) => {
@@ -140,10 +147,14 @@ const getFiles = (event, storedFiles) => {
 
 			tempFiles.push(result);
 		}
-
 		resolve(await Promise.allSettled(tempFiles));
 	});
 };
+
+toggleBtn.addEventListener("click", () => {
+	sidebar.classList.toggle("hidden");
+	dupeCheck();
+});
 
 filePickerBtn.addEventListener("click", () => {
 	input.click();
