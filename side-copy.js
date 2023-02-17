@@ -66,7 +66,10 @@ const generator = async (file, event) => {
 		function addProperties(obj, parent) {
 			for (let key in obj) {
 				if (obj.hasOwnProperty(key)) {
-					if (!Array.isArray(obj[key]) && typeof obj[key] === "object") {
+					if (
+						Array.isArray(obj[key]).length < 5 ||
+						typeof obj[key] === "object"
+					) {
 						const subSpoiler = document.createElement("details");
 						const subSummary = document.createElement("summary");
 
@@ -77,7 +80,7 @@ const generator = async (file, event) => {
 						parent.appendChild(subSpoiler);
 
 						addProperties(obj[key], subSpoiler);
-					} else if (Array.isArray(obj[key])) {
+					} else if (Array.isArray(obj[key]).length > 5) {
 						const property = document.createElement("div");
 
 						property.textContent = `${key} : ${JSON.stringify(
