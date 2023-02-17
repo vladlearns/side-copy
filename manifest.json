@@ -9,12 +9,5 @@
 			"js": ["side-copy.js"]
 		}
 	],
-	"permissions": [
-		"activeTab",
-		"tabs",
-		"storage",
-		"contextMenus",
-		"clipboardWrite",
-		"clipboardRead"
-	]
+	"permissions": ["storage", "clipboardWrite", "clipboardRead"]
 }
