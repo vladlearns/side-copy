@@ -4,8 +4,7 @@
 
 ### Showcase:
 
-![](assets/screenshot1.png)
-![](assets/screenshot2.png)
+![](assets/demo.gif)
 
 This extension is a helpful tool for anyone who works with JSON files. It adds a sidebar to your browser where you can view the contents of your JSON files in a structured and organized way, making it easier to navigate and understand large amounts of data.
 
