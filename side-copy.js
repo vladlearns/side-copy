@@ -3,15 +3,16 @@ sidebar.id = "json-sidebar";
 sidebar.classList = "hidden";
 document.body.appendChild(sidebar);
 
-const toggleBtn = document.createElement("button");
+const toggleBtn = document.createElement("div");
 toggleBtn.id = "json-sidebar-toggle";
+toggleBtn.role = "button";
 toggleBtn.textContent = "Toggle Sidebar";
 document.body.appendChild(toggleBtn);
 
-const filePickerBtn = document.createElement("button");
+const filePickerBtn = document.createElement("div");
 filePickerBtn.id = "json-folder-picker";
 filePickerBtn.textContent = "Choose Folder";
-filePickerBtn.classList = "btn-choose-folder";
+filePickerBtn.role = "button";
 document.body.appendChild(filePickerBtn);
 
 const input = document.createElement("input");
@@ -22,7 +23,8 @@ input.style.display = "none";
 input.accept = ".json";
 document.body.appendChild(input);
 
-const dupeCheck = () => {``
+const dupeCheck = () => {
+	``;
 	if (chrome.storage.local) {
 		chrome.storage.local.get(["sidebarContent"]).then((result) => {
 			result.sidebarContent.forEach((file, i, storedFiles) => {
@@ -186,6 +188,7 @@ style.innerHTML = `
 		overflow: auto;
 	}
 
+
 	@media (max-width: 600px) {
 		#json-sidebar {
 		width: 100%;
@@ -200,17 +203,26 @@ style.innerHTML = `
 	}
 
 	#json-sidebar-toggle {
+		font-size: 16px !important;
+		font-family: Hyperlegible !important;
+		font-weight: bold !important;
+		mix-blend-mode: difference;
 		position: fixed;
 		top: 10px;
 		right: 10px;
-		z-index:  calc(9e999);
+		z-index: calc(9e999);
 	}
 
+
 	#json-folder-picker {
+		font-size: 16px !important;
+		font-family: Hyperlegible !important;
+		font-weight: bold !important;
+		mix-blend-mode: difference;
 		position: fixed;
 		top: 40px;
 		right: 10px;
-		z-index:  calc(9e999);
+		z-index: calc(9e999);
 	}
 
 	#json-sidebar pre {
@@ -221,18 +233,10 @@ style.innerHTML = `
 	}
 
 	#json-sidebar summary {
+		font-size: 16px !important;
+		font-family: Hyperlegible !important;
+		mix-blend-mode: difference;
 		font-weight: bold;
-		cursor: pointer;
-	}
-
-	#toggle-btn {
-		position: fixed;
-		top: 20px;
-		left: 20px;
-		padding: 10px 20px;
-		background: #fff;
-		border-radius: 5px;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
 		cursor: pointer;
 	}
 
@@ -246,11 +250,6 @@ style.innerHTML = `
 	}
 	#json-sidebar button:hover {
 		background: #3e8e41;
-	}
-
-	@keyframes slideIn {
-		from {transform: translateX(-100%);}
-		to {transform: translateX(0);}
 	}
 
 	#json-sidebar.open {
@@ -271,15 +270,6 @@ style.innerHTML = `
 		right: 10px;
 		}
 
-	#toggle-btn {
-		z-index:  calc(9e999);
-	}
-
-	#btn-choose-folder {
-
-		z-index:  calc(9e999);
-
-	}
 
 `;
 
