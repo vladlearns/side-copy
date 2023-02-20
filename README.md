@@ -1,6 +1,6 @@
 ![](assets/logo.png)
 
-# side-copy Extension
+# side-copy
 
 ### Showcase:
 
