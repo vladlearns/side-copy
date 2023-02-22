@@ -24,7 +24,6 @@ input.accept = ".json";
 document.body.appendChild(input);
 
 const dupeCheck = () => {
-	``;
 	if (chrome.storage.local) {
 		chrome.storage.local.get(["sidebarContent"]).then((result) => {
 			result.sidebarContent.forEach((file, i, storedFiles) => {
